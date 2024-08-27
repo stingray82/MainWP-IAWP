@@ -1,8 +1,6 @@
 
 # MainWP to Independent Analytics Bridge
-![Logo](https://i.ibb.co/Fgptkdf/Mainep-IA-Bridge.png)
 
-MainWP to Independent Analytics (WIP)
 Warning: This is work in Progress and currently requires a custom template per client site!!!!
 
 These notes are currently more for me than anyone else as the project is a working proof of concept; 
@@ -49,7 +47,6 @@ It adds three new custom tokens you can access which are displayed below;
 [ipwa-visitors]
 [ipwa-sessions]
 
-![Extra Row in Report  with full output](https://i.ibb.co/x1Gr5Xk/IWAP-bridge.png)
 
 
 
