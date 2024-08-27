@@ -1,6 +1,7 @@
 
 # MainWP to Independent Analytics Bridge
-![enter image description here](https://i.ibb.co/Fgptkdf/Mainep-IA-Bridge.png)
+![Logo](https://i.ibb.co/Fgptkdf/Mainep-IA-Bridge.png)
+
 MainWP to Independent Analytics (WIP)
 Warning: This is work in Progress and currently requires a custom template per client site!!!!
 
@@ -36,7 +37,7 @@ Please replace site URL with your actual URL this template is for
 3) Add your custom-email-body.php to wp-content/uploads/mainwp/report-email-templates/
 Edit logo and other details (You can scrip this step if you have your own and can add it in) you will need to add the function above though - **Remember to set the site URL**
 4) Select your dates range from the extentions settings:
-![enter image description here](https://i.ibb.co/rGbF9VS/Date-Picker.png)
+![Date Picker Screen](https://i.ibb.co/rGbF9VS/Date-Picker.png)
 5) test your template
 6) Currently assuming you send out monthly you will need to change the dates manually every month (some additional modification could be added here to minipulate the based on month i.e start to end of the previous month but I want to wait to see if there is a way to hook in that doesn't require all these modifications first.
 
@@ -48,7 +49,7 @@ It adds three new custom tokens you can access which are displayed below;
 [ipwa-visitors]
 [ipwa-sessions]
 
-![enter image description here](https://i.ibb.co/x1Gr5Xk/IWAP-bridge.png)
+![Extra Row in Report  with full output](https://i.ibb.co/x1Gr5Xk/IWAP-bridge.png)
 
 
 
