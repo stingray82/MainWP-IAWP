@@ -1,23 +1,42 @@
 <?php
-/*
-Plugin Name: MainWP IAWP Bridge Extension
-Plugin URI: https://mainwp.com
-Description: MainWP IAWP_Bridge Extension is a MainWP to Independant Anayltics Bridge
-Version: 0.1
-Author: MainWP
-Author URI: https://mainwp.com
-Icon URI:
-*/
+/**
+ * Main WP To Independent Analytics Child Plugin
+ *
+ * @author        Stingray82
+ * @license       gplv2
+ * @version       1.00
+ *
+ * @wordpress-plugin
+ * Plugin Name:   Main WP To Independent Analytics Bridge
+ * Plugin URI:    https://github.com/stingray82/MainWP-IAWP
+ * Description:   Install on your dashboard and it will interface with the child sites you have IA installed on;
+ * Version:       1.00
+ * Author:        Stingray82
+ * Author URI:    https://github.com/stingray82
+ * Text Domain:   main-wp-to-independent-analytics-bridge-extention
+ * Domain Path:   /languages
+ * License:       GPLv2
+ * License URI:   https://www.gnu.org/licenses/gpl-2.0.html
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Main WP To Independent Analytics Child Plugin. If not, see <https://www.gnu.org/licenses/gpl-2.0.html/>.
+ */
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
 
 class MainWP_IAWP_Bridge_Extension {
 
     public function __construct() {
         add_filter( 'mainwp_getsubpages_sites', array( &$this, 'managesites_subpage' ), 10, 1 );
         add_action( 'admin_init', array( &$this, 'admin_init' ) );
+        add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue_admin_scripts' ) );
     }
 
     public function admin_init() {
-        // Add any necessary initialization code here
+        // Register settings
+        register_setting('mainwp_iawp_bridge_options_group', 'iamwp_custom_from_date');
+        register_setting('mainwp_iawp_bridge_options_group', 'iamwp_custom_to_date');
     }
 
     public function managesites_subpage( $subPage ) {
@@ -32,6 +51,12 @@ class MainWP_IAWP_Bridge_Extension {
         return $subPage;
     }
 
+    public function enqueue_admin_scripts() {
+        // Enqueue jQuery UI Datepicker
+        wp_enqueue_script('jquery-ui-datepicker');
+        wp_enqueue_style('jquery-ui-datepicker-style', 'https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css');
+    }
+
     public static function renderPage() {
         global $mainwpIAWPBridgeActivator;
 
@@ -40,23 +65,52 @@ class MainWP_IAWP_Bridge_Extension {
             echo 'MainWP Bridge Activator is not initialized.';
             return;
         }
+
+        // Output the inline script to initialize the datepicker
+        echo '<script type="text/javascript">
+            jQuery(document).ready(function($) {
+                $(".custom-date-picker").datepicker({
+                    dateFormat: "yy-mm-dd"
+                });
+            });
+        </script>';
         
-            ?>      
-            <div class="ui segment">
-                <div class="inside">
-                    <p><?php _e('There is nonthing to set in here, this is used for debug only'); ?></p>
-                </div>
+        ?>
+        <div class="ui segment">
+            <div class="inside">
+                <form method="post" action="options.php">
+                    <?php
+                    settings_fields('mainwp_iawp_bridge_options_group');
+                    do_settings_sections('mainwp_iawp_bridge_options_group');
+
+                    $from_date = get_option('iamwp_custom_from_date', '');
+                    $to_date = get_option('iamwp_custom_to_date', '');
+                    ?>
+
+                    <h2><?php _e('Set Date Range for Analytics'); ?></h2>
+
+                    <p>
+                        <label for="iamwp_custom_from_date"><?php _e('From Date'); ?>:</label><br>
+                        <input type="text" id="iamwp_custom_from_date" name="iamwp_custom_from_date" value="<?php echo esc_attr($from_date); ?>" class="custom-date-picker" />
+                    </p>
+
+                    <p>
+                        <label for="iamwp_custom_to_date"><?php _e('To Date'); ?>:</label><br>
+                        <input type="text" id="iamwp_custom_to_date" name="iamwp_custom_to_date" value="<?php echo esc_attr($to_date); ?>" class="custom-date-picker" />
+                    </p>
+
+                    <?php submit_button(); ?>
+                </form>
             </div>
-            <?php
-            
-    
-}
+        </div>
+        <?php
+    }
 }
 
 // Close the MainWP_IAWP_Bridge_Extension class here
 
-
-function mycustom_generate_analytics_tokens($tokensValues, $report, $website) {
+//Have kept this in as if we can get it working automatically wont need to pass the paramaters manually as currently needed 
+/* function iwap_generate_Custom_analytics_tokens_old($tokensValues, $report, $website) {
     // Log for debugging
     error_log('Custom token filter applied');
 
@@ -74,9 +128,14 @@ function mycustom_generate_analytics_tokens($tokensValues, $report, $website) {
     
     /* As I can't process the "token" need supports help for this one will temp add them in to check everything else works */
     // Variables
-    $from_date_obj = "2024-08-01";
+    /*$from_date_obj = "2024-08-01";
     $to_date_obj = "2024-08-27";
     $site_url = "https://home-heroes.co.uk";
+
+    // Use the passed $site_url
+    $from_date_obj = "2024-08-01";
+    $to_date_obj = "2024-08-27";
+
     
     // Check if the DateTime objects were created successfully
     if (!$from_date_obj || !$to_date_obj) {
@@ -90,9 +149,69 @@ function mycustom_generate_analytics_tokens($tokensValues, $report, $website) {
     $to_date = $to_date_obj;
 
     // Build the API URL
-    $api_url = "{$site_url}/test.php?from={$from_date}&to={$to_date}";
+    //$api_url = "{$site_url}/test.php?from={$from_date}&to={$to_date}";
     // The Below works with the new child plugin for wider testing
-    //$api_url = "{$site_url}/wp-content/plugins/main-wp-to-independent-analytics-child-plugin/api.php?from={$from_date}&to={$to_date}";
+    $api_url = "{$site_url}/wp-content/plugins/main-wp-to-independent-analytics-child-plugin/api.php?from={$from_date}&to={$to_date}";
+
+    // Fetch the data from the API
+    $response = wp_remote_get($api_url);
+
+    // Check if the request was successful
+    if (is_wp_error($response)) {
+        error_log('Error: Failed to retrieve data from API. ' . $response->get_error_message());
+        return $tokensValues;
+    }
+
+    // Decode the JSON response
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body);
+
+    // Check if the data is valid
+    if (isset($data->views) && isset($data->visitors) && isset($data->sessions)) {
+        // Assign the values to variables
+        $ipwa_views = $data->views;
+        $ipwa_visitors = $data->visitors;
+        $ipwa_sessions = $data->sessions;
+        error_log('Views:'.$ipwa_views);
+        error_log('Visitors:'.$ipwa_visitors);
+        error_log('Sessions:'.$ipwa_sessions);
+
+        // Add these values as tokens
+        $tokensValues['[ipwa-views]'] = $ipwa_views;
+        $tokensValues['[ipwa-visitors]'] = $ipwa_visitors;
+        $tokensValues['[ipwa-sessions]'] = $ipwa_sessions;
+
+        // Log success
+        error_log('Successfully retrieved and processed data from API.');
+    } else {
+        // Log if data is invalid
+        error_log('Error: Invalid data received from API.');
+    }
+
+    return $tokensValues;
+} */
+
+ function iwap_generate_Custom_analytics_tokens($tokensValues, $report, $website, $site_url) {
+    error_log('Custom token filter applied');
+
+ // Get the date range from the options set by the user
+    $from_date_obj = get_option('iamwp_custom_from_date', '');
+$to_date_obj = get_option('iamwp_custom_to_date', '');
+
+    // Check if the DateTime objects were passed successfully
+    if (!$from_date_obj || !$to_date_obj) {
+        error_log('Error: Invalid date format.');
+        return $tokensValues; // Return early if the dates are invalid
+    }
+
+    // Convert the dates to the required format
+    $from_date = $from_date_obj;
+    $to_date = $to_date_obj;
+
+    // Build the API URL
+    //$api_url = "{$site_url}/test.php?from={$from_date}&to={$to_date}";
+    // The Below works with the new child plugin for wider testing
+    $api_url = "{$site_url}/wp-content/plugins/main-wp-to-independent-analytics-child-plugin/api.php?from={$from_date}&to={$to_date}";
 
     // Fetch the data from the API
     $response = wp_remote_get($api_url);
@@ -133,15 +252,11 @@ function mycustom_generate_analytics_tokens($tokensValues, $report, $website) {
 }
 
 
-/*
- * Activator Class is used for extension activation and deactivation
- */
-
 class MainWP_IAWP_Bridge_Activator {
 
     protected $mainwpIAWPBridgeActivated = false;
-    protected $childEnabled                  = false;
-    protected $childKey                      = false;
+    protected $childEnabled = false;
+    protected $childKey = false;
     protected $childFile;
     protected $plugin_handle = 'mainwp-IAWP-Bridge-extension';
 
@@ -155,8 +270,7 @@ class MainWP_IAWP_Bridge_Activator {
         if ( $this->mainwpIAWPBridgeActivated !== false ) {
             $this->activate_this_plugin();
         } else {
-            // Because sometimes our main plugin is activated after the extension plugin is activated we also have a second step,
-            // listening to the 'mainwp_activated' action. This action is triggered by MainWP after initialisation.
+            // Listening to the 'mainwp_activated' action
             add_action( 'mainwp_activated', array( &$this, 'activate_this_plugin' ) );
         }
         add_action( 'admin_notices', array( &$this, 'mainwp_error_notice' ) );
@@ -173,8 +287,6 @@ class MainWP_IAWP_Bridge_Activator {
     }
 
     function settings() {
-        // The "mainwp_pageheader_extensions" action is used to render the tabs on the Extensions screen.
-        // It's used together with mainwp_pagefooter_extensions and mainwp_getextensions
         do_action( 'mainwp_pageheader_extensions', __FILE__ );
         if ( $this->childEnabled ) {
             MainWP_IAWP_Bridge_Extension::renderPage();
@@ -186,16 +298,9 @@ class MainWP_IAWP_Bridge_Activator {
         do_action( 'mainwp_pagefooter_extensions', __FILE__ );
     }
 
-    // The function "activate_this_plugin" is called when the main is initialized.
     function activate_this_plugin() {
-        // Checking if the MainWP plugin is enabled. This filter will return true if the main plugin is activated.
         $this->mainwpIAWPBridgeActivated = apply_filters( 'mainwp_activated_check', $this->mainwpIAWPBridgeActivated );
-
-        // The 'mainwp_extension_enabled_check' hook. If the plugin is not enabled this will return false,
-        // if the plugin is enabled, an array will be returned containing a key.
-        // This key is used for some data requests to our main
         $this->childEnabled = apply_filters( 'mainwp_extension_enabled_check', __FILE__ );
-
         $this->childKey = $this->childEnabled['key'];
 
         new MainWP_IAWP_Bridge_Extension();

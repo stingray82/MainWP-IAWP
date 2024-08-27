@@ -1,7 +1,10 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 ?>
-<?php add_filter('mainwp_pro_reports_custom_tokens', 'mycustom_generate_analytics_tokens', 10, 3); ?>
+//<?php add_filter('mainwp_pro_reports_custom_tokens', function($tokensValues, $report, $website) {
+    $site_url = "https://yoursitehere.com"; // Replace with the dynamic site URL
+    return iwap_generate_Custom_analytics_tokens($tokensValues, $report, $website, $site_url);
+}, 10, 3); ?>
 <!DOCTYPE html>
 <div style="font-size: 0px;">
 <table style="width: 600px; margin: 0 auto; padding: 0; border-spacing: 0; border-collapse: collapse; color: #41413c; font-size: 16px;">
@@ -17,7 +20,7 @@ defined( 'ABSPATH' ) || exit;
 </td>
 </tr>
 <tr>
-	<td style="background: #1c1d1b; margin-top: 0; padding: 0; height: 180px; text-align: center; border-bottom: 5px solid #7fb100;"><img class="aligncenter" style="display: block; border: 0; line-height: 1; margin: 0 auto; font-size: 16px;" src="https://thanet.digital/wp-content/uploads/Thanet-Digital-Header_drk.png" width="300" alt="Logo" /></td>
+	<td style="background: #1c1d1b; margin-top: 0; padding: 0; height: 180px; text-align: center; border-bottom: 5px solid #7fb100;"><img class="aligncenter" style="display: block; border: 0; line-height: 1; margin: 0 auto; font-size: 16px;" src="https://mainwp.com/wp-content/uploads/2024/03/company-laceholder-logo.png" alt="Logo" /></td>
 </tr>
 <tr>
 <td style="padding: 2em; background-color: #E7EEF6;">
@@ -38,7 +41,7 @@ defined( 'ABSPATH' ) || exit;
 <br/><span style="font-size: 24px; line-height: .5;">Uptime</span></p>
 </td>
 <td style="width: 50%;" colspan="3">
-<p style="text-align: center; margin: 0;"><span style="display: block; width: 100px; height: 100px; border-radius: 50%; background: #3a4c58; margin: 0 auto; color: #F1F6FA; font-size: 24px; font-weight: bold; line-height: 4;"><strong>[ga.pageviews]</strong></span>
+<p style="text-align: center; margin: 0;"><span style="display: block; width: 100px; height: 100px; border-radius: 50%; background: #3a4c58; margin: 0 auto; color: #F1F6FA; font-size: 24px; font-weight: bold; line-height: 4;"><strong>[ipwa-visitors]</strong></span>
 <br/><span style="font-size: 24px; line-height: .5;">Visits <small>(page views)</small></span></p>
 </td>
 </tr>
@@ -80,7 +83,7 @@ defined( 'ABSPATH' ) || exit;
 </td>
 </tr>
 <tr>
-<td style="padding: 1.5em; text-align: center; font-size: 80%; background: #3a4c58; color: #FAAC2E;"><a style="color: #FAAC2E;" href="https://thanet.digital">Thanet Digital Limited</a> • <a style="color: #FAAC2E;" href="mailto:hello@thanet.digital">hello@thanet.digital</a></td>
+<td style="padding: 1.5em; text-align: center; font-size: 80%; background: #3a4c58; color: #7fb100;"><a style="color: #7fb100;" href="https://mainwp.com/">Your Company</a> • address • <a style="color: #7fb100;" href="mailto:noreply@abc.com">noreply@yourcompany.com</a></td>
 </tr>
 </tbody>
 </table>

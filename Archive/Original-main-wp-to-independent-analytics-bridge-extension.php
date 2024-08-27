@@ -1,13 +1,32 @@
 <?php
-/*
-Plugin Name: MainWP IAWP Bridge Extension
-Plugin URI: https://mainwp.com
-Description: MainWP IAWP_Bridge Extension is a MainWP to Independant Anayltics Bridge
-Version: 0.1
-Author: MainWP
-Author URI: https://mainwp.com
-Icon URI:
-*/
+/**
+ * Main WP To Independent Analytics Child Plugin
+ *
+ * @author        Stingray82
+ * @license       gplv2
+ * @version       1.00
+ *
+ * @wordpress-plugin
+ * Plugin Name:   Main WP To Independent Analytics Bridge
+ * Plugin URI:    https://github.com/stingray82/MainWP-IAWP
+ * Description:   Install on your dashboard and it will interface with the child sites you have IA installed on;
+ * Version:       1.00
+ * Author:        Stingray82
+ * Author URI:    https://github.com/stingray82
+ * Text Domain:   main-wp-to-independent-analytics-bridge-extention
+ * Domain Path:   /languages
+ * License:       GPLv2
+ * License URI:   https://www.gnu.org/licenses/gpl-2.0.html
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Main WP To Independent Analytics Child Plugin. If not, see <https://www.gnu.org/licenses/gpl-2.0.html/>.
+ */
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+// Include your custom code here.
+
 
 class MainWP_IAWP_Bridge_Extension {
 
@@ -55,8 +74,8 @@ class MainWP_IAWP_Bridge_Extension {
 
 // Close the MainWP_IAWP_Bridge_Extension class here
 
-
-function mycustom_generate_analytics_tokens($tokensValues, $report, $website) {
+//Have kept this in as if we can get it working automatically wont need to pass the paramaters manually as currently needed 
+/* function iwap_generate_Custom_analytics_tokens_old($tokensValues, $report, $website) {
     // Log for debugging
     error_log('Custom token filter applied');
 
@@ -74,9 +93,14 @@ function mycustom_generate_analytics_tokens($tokensValues, $report, $website) {
     
     /* As I can't process the "token" need supports help for this one will temp add them in to check everything else works */
     // Variables
-    $from_date_obj = "2024-08-01";
+    /*$from_date_obj = "2024-08-01";
     $to_date_obj = "2024-08-27";
     $site_url = "https://home-heroes.co.uk";
+
+    // Use the passed $site_url
+    $from_date_obj = "2024-08-01";
+    $to_date_obj = "2024-08-27";
+
     
     // Check if the DateTime objects were created successfully
     if (!$from_date_obj || !$to_date_obj) {
@@ -90,9 +114,71 @@ function mycustom_generate_analytics_tokens($tokensValues, $report, $website) {
     $to_date = $to_date_obj;
 
     // Build the API URL
-    $api_url = "{$site_url}/test.php?from={$from_date}&to={$to_date}";
+    //$api_url = "{$site_url}/test.php?from={$from_date}&to={$to_date}";
     // The Below works with the new child plugin for wider testing
-    //$api_url = "{$site_url}/wp-content/plugins/main-wp-to-independent-analytics-child-plugin/api.php?from={$from_date}&to={$to_date}";
+    $api_url = "{$site_url}/wp-content/plugins/main-wp-to-independent-analytics-child-plugin/api.php?from={$from_date}&to={$to_date}";
+
+    // Fetch the data from the API
+    $response = wp_remote_get($api_url);
+
+    // Check if the request was successful
+    if (is_wp_error($response)) {
+        error_log('Error: Failed to retrieve data from API. ' . $response->get_error_message());
+        return $tokensValues;
+    }
+
+    // Decode the JSON response
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body);
+
+    // Check if the data is valid
+    if (isset($data->views) && isset($data->visitors) && isset($data->sessions)) {
+        // Assign the values to variables
+        $ipwa_views = $data->views;
+        $ipwa_visitors = $data->visitors;
+        $ipwa_sessions = $data->sessions;
+        error_log('Views:'.$ipwa_views);
+        error_log('Visitors:'.$ipwa_visitors);
+        error_log('Sessions:'.$ipwa_sessions);
+
+        // Add these values as tokens
+        $tokensValues['[ipwa-views]'] = $ipwa_views;
+        $tokensValues['[ipwa-visitors]'] = $ipwa_visitors;
+        $tokensValues['[ipwa-sessions]'] = $ipwa_sessions;
+
+        // Log success
+        error_log('Successfully retrieved and processed data from API.');
+    } else {
+        // Log if data is invalid
+        error_log('Error: Invalid data received from API.');
+    }
+
+    return $tokensValues;
+} */
+
+ function iwap_generate_Custom_analytics_tokens($tokensValues, $report, $website, $site_url) {
+    error_log('Custom token filter applied');
+
+    // Use the passed $site_url
+    $from_date_obj = apply_filters('custom_from_date', '');
+    $to_date_obj = apply_filters('custom_to_date', '');
+
+    
+    // Check if the DateTime objects were created successfully
+    if (!$from_date_obj || !$to_date_obj) {
+        error_log('Error: Invalid date format in report.daterange.');
+        return $tokensValues; // Return early if the dates are invalid
+    }
+
+   // $from_date = $from_date_obj->format('Y-m-d');
+    //$to_date = $to_date_obj->format('Y-m-d');
+    $from_date = $from_date_obj;
+    $to_date = $to_date_obj;
+
+    // Build the API URL
+    //$api_url = "{$site_url}/test.php?from={$from_date}&to={$to_date}";
+    // The Below works with the new child plugin for wider testing
+    $api_url = "{$site_url}/wp-content/plugins/main-wp-to-independent-analytics-child-plugin/api.php?from={$from_date}&to={$to_date}";
 
     // Fetch the data from the API
     $response = wp_remote_get($api_url);
