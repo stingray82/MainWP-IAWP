@@ -1,10 +1,6 @@
 <?php
 defined( 'ABSPATH' ) || exit;
 ?>
-//<?php add_filter('mainwp_pro_reports_custom_tokens', function($tokensValues, $report, $website) {
-    $site_url = "https://yoursitehere.com"; // Replace with the dynamic site URL
-    return iwap_generate_Custom_analytics_tokens($tokensValues, $report, $website, $site_url);
-}, 10, 3); ?>
 <!DOCTYPE html>
 <div style="font-size: 0px;">
 <table style="width: 600px; margin: 0 auto; padding: 0; border-spacing: 0; border-collapse: collapse; color: #41413c; font-size: 16px;">
