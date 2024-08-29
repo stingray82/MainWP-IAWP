@@ -1,40 +1,16 @@
 <?php
 /**
- * Main WP To Independent Analytics Child Plugin
+ * Main WP To Independent Analytics Bridge
  *
  * @author        Stingray82
  * @license       gplv2
- * @version       1.0.1
- *
- * @wordpress-plugin
- * Plugin Name:   Main WP To Independent Analytics Bridge
- * Plugin URI:    https://github.com/stingray82/MainWP-IAWP
- * Description:   Install on your dashboard and it will interface with the child sites you have IA
-
-2/2
-
-You said:
-Can I have the full plugin with the debug check?
-ChatGPT said:
-ChatGPT
-Certainly! Here's the updated plugin code with a debug check based on the existence of debug.conf. The plugin will conditionally enable debugging if the file is found.
-
-Updated Plugin Code
-php
-Copy code
-<?php
-/**
- * Main WP To Independent Analytics Child Plugin
- *
- * @author        Stingray82
- * @license       gplv2
- * @version       1.01
+ * @version       1.02
  *
  * @wordpress-plugin
  * Plugin Name:   Main WP To Independent Analytics Bridge
  * Plugin URI:    https://github.com/stingray82/MainWP-IAWP
  * Description:   Install on your dashboard and it will interface with the child sites you have IA installed on;
- * Version:       1.01
+ * Version:       1.02
  * Author:        Stingray82
  * Author URI:    https://github.com/stingray82
  * Text Domain:   main-wp-to-independent-analytics-bridge-extention
@@ -53,10 +29,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 $debug_enabled = file_exists(__DIR__ . '/debug.conf');
 
 // Function to log messages if debugging is enabled
-function debug_log($message) {
-    global $debug_enabled;
-    if ($debug_enabled) {
-        debug_log($message);
+if (!function_exists('IAWP_debug_log')) {
+    function IAWP_debug_log($message) {
+        global $debug_enabled;
+        if ($debug_enabled) {
+            error_log($message);
+        }
     }
 }
 
@@ -107,33 +85,33 @@ class MainWP_IAWP_Bridge_Extension {
 add_filter('mainwp_pro_reports_custom_tokens', 'iwap_generate_custom_analytics_tokens', 10, 4);
 
 function iwap_generate_custom_analytics_tokens($tokensValues, $report, $site, $templ_email) {
-    debug_log('IAMP-Custom token filter applied');
+    IAWP_debug_log('IAMP-Custom token filter applied');
 
     // Ensure the site URL is set
     $site_url = isset($site['url']) ? $site['url'] : '';
     if (!$site_url) {
-        debug_log('IAMP-Error: Site URL is not set.');
+        IAWP_debug_log('IAMP-Error: Site URL is not set.');
         return $tokensValues;
     }
 
     // Add the site URL to the tokens array
     $tokensValues['[IPWA_SITE_URL]'] = $site_url;
-    debug_log('IAMP-Site URL: ' . $site_url);
+    IAWP_debug_log('IAMP-Site URL: ' . $site_url);
 
     // Debugging: Log the entire $report object to inspect its structure
-    debug_log('IAMP-Report Object: ' . print_r($report, true));
+    IAWP_debug_log('IAMP-Report Object: ' . print_r($report, true));
 
     // Retrieve the date range from the report object and convert the timestamps to a readable format
     $from_date = isset($report->date_from) ? date('Y-m-d', $report->date_from) : '';
     $to_date = isset($report->date_to) ? date('Y-m-d', $report->date_to) : '';
 
     // Log the retrieved dates
-    debug_log('IAMP-From Date: ' . $from_date);
-    debug_log('IAMP-To Date: ' . $to_date);
+    IAWP_debug_log('IAMP-From Date: ' . $from_date);
+    IAWP_debug_log('IAMP-To Date: ' . $to_date);
 
     // Check if the dates are valid
     if (!$from_date || !$to_date) {
-        debug_log('IAMP-Error: Invalid date format.');
+        IAWP_debug_log('IAMP-Error: Invalid date format.');
         return $tokensValues; // Return early if the dates are invalid
     }
 
@@ -143,14 +121,14 @@ function iwap_generate_custom_analytics_tokens($tokensValues, $report, $site, $t
 
     // Build the API URL for fetching analytics data
     $api_url = "{$site_url}/wp-json/iawp/v1/analytics/?from={$from_date}&to={$to_date}";
-    debug_log('IAMP-API URL: ' . $api_url);
+    IAWP_debug_log('IAMP-API URL: ' . $api_url);
 
     // Fetch the data from the API
     $response = wp_remote_get($api_url);
 
     // Check if the request was successful
     if (is_wp_error($response)) {
-        debug_log('IAMP-Error: Failed to retrieve data from API. ' . $response->get_error_message());
+        IAWP_debug_log('IAMP-Error: Failed to retrieve data from API. ' . $response->get_error_message());
         return $tokensValues;
     }
 
@@ -164,9 +142,9 @@ function iwap_generate_custom_analytics_tokens($tokensValues, $report, $site, $t
         $ipwa_views = $data->views;
         $ipwa_visitors = $data->visitors;
         $ipwa_sessions = $data->sessions;
-        debug_log('IAMP-Views: ' . $ipwa_views);
-        debug_log('IAMP-Visitors: ' . $ipwa_visitors);
-        debug_log('IAMP-Sessions: ' . $ipwa_sessions);
+        IAWP_debug_log('IAMP-Views: ' . $ipwa_views);
+        IAWP_debug_log('IAMP-Visitors: ' . $ipwa_visitors);
+        IAWP_debug_log('IAMP-Sessions: ' . $ipwa_sessions);
 
         // Add these values as tokens
         $tokensValues['[ipwa-views]'] = $ipwa_views;
@@ -174,10 +152,10 @@ function iwap_generate_custom_analytics_tokens($tokensValues, $report, $site, $t
         $tokensValues['[ipwa-sessions]'] = $ipwa_sessions;
 
         // Log success
-        debug_log('IAMP-Successfully retrieved and processed data from API.');
+        IAWP_debug_log('IAMP-Successfully retrieved and processed data from API.');
     } else {
         // Log if data is invalid
-        debug_log('IAMP-Error: Invalid data received from API.');
+        IAWP_debug_log('IAMP-Error: Invalid data received from API.');
     }
 
     return $tokensValues;
