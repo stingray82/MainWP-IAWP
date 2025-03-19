@@ -1,26 +1,19 @@
 <?php
 /**
- * Main WP To Independent Analytics Bridge
- *
- * @author        Stingray82
- * @license       gplv2
- * @version       1.02
- *
- * @wordpress-plugin
- * Plugin Name:   Main WP To Independent Analytics Bridge
- * Plugin URI:    https://github.com/stingray82/MainWP-IAWP
- * Description:   Install on your dashboard and it will interface with the child sites you have IA installed on;
- * Version:       1.02
- * Author:        Stingray82
- * Author URI:    https://github.com/stingray82
- * Text Domain:   main-wp-to-independent-analytics-bridge-extention
- * Domain Path:   /languages
- * License:       GPLv2
- * License URI:   https://www.gnu.org/licenses/gpl-2.0.html
- *
- * You should have received a copy of the GNU General Public License
- * along with Main WP To Independent Analytics Child Plugin. If not, see <https://www.gnu.org/licenses/gpl-2.0.html/>.
- */
+ * Plugin Name:       Main WP To Independent Analytics Bridge
+ * Tested up to:      6.7.2
+ * Description:       Install on your dashboard and it will interface with the child sites you have IA installed on;
+ * Requires at least: 6.5
+ * Requires PHP:      7.4
+ * Version:           1.02
+ * Author:            Stingray82
+ * Author URI:        https://github.com/stingray82
+ * License:           GPLv2
+ * License URI:       https://www.gnu.org/licenses/gpl-2.0.html
+ * Text Domain:       main-wp-to-independent-analytics-bridge-extention
+ * Website:           https://reallyusefulplugins.com
+ * */
+
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) exit;
